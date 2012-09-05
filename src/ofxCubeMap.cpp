@@ -9,6 +9,30 @@ ofxCubeMap::ofxCubeMap()
 	far 	= 1024.0f;
 	
 	cubeMapCamerasRenderPosition.set( 0.0f, 0.0f, 0.0f );
+	
+
+	fillScreenMesh.setMode( OF_PRIMITIVE_TRIANGLES );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(1, 1) );
+	fillScreenMesh.addVertex( 	ofVec3f(1,  1,  0) );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(0, 1) );
+	fillScreenMesh.addVertex( 	ofVec3f(-1,  1,  0) );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(0, 0) );
+	fillScreenMesh.addVertex( 	ofVec3f(-1, -1,  0) );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(1, 1) );
+	fillScreenMesh.addVertex( 	ofVec3f(1,  1,  0) );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(0, 0) );
+	fillScreenMesh.addVertex( 	ofVec3f(-1, -1,  0) );
+	
+	fillScreenMesh.addTexCoord( ofVec2f(1, 0) );
+	fillScreenMesh.addVertex( 	ofVec3f(1, -1,  0) );
+	
+	setupSkyBoxVertices();
+	
 }
 
 //--------------------------------------------------------------
@@ -220,32 +244,25 @@ void ofxCubeMap::unbind()
 }
 
 //--------------------------------------------------------------
-void ofxCubeMap::enableFixedMapping()
+void ofxCubeMap::drawSkybox( float _size )
 {
-#ifndef TARGET_OPENGLES
-	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
-	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
-	glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP );
-	glEnable(GL_TEXTURE_GEN_S);
-	glEnable(GL_TEXTURE_GEN_T);
-	glEnable(GL_TEXTURE_GEN_R);
-#endif
-	glEnable( GL_TEXTURE_CUBE_MAP );
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapVertices.data()->x );
+	
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapTexCoords.data()->x );
+	
+	ofPushMatrix();
+		ofScale( _size, _size, _size );
+		glDrawArrays(GL_TRIANGLES, 0, cubemapVertices.size() );
+	glPopMatrix();
+	
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 //--------------------------------------------------------------
-void ofxCubeMap::disableFixedMapping()
-{
-#ifndef TARGET_OPENGLES
-	glDisable(GL_TEXTURE_GEN_S);
-	glDisable(GL_TEXTURE_GEN_T);
-	glDisable(GL_TEXTURE_GEN_R);
-#endif
-	glDisable( GL_TEXTURE_CUBE_MAP );
-}
-
-//--------------------------------------------------------------
-void ofxCubeMap::debugDrawCubemapCameras(  )
+void ofxCubeMap::debugDrawCubemapCameras()
 {
 	for( int i = 0; i < 6; i++ )
 	{
@@ -532,3 +549,138 @@ string ofxCubeMap::getDescriptiveStringForFace( GLuint _face )
 	
 }
 
+//--------------------------------------------------------------
+void ofxCubeMap::setupSkyBoxVertices()
+{
+	
+	//ofScale( _size, _size, _size );
+	//ofScale( _size / 2.0f, _size / 2.0f, _size / 2.0f );
+	
+	float fExtent = 1.0f / 2.0f;
+	
+	
+	
+	///////////////////////////////////////////////
+	//  Postive X
+	cubemapTexCoords.push_back( ofVec3f(1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f(1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, fExtent) );
+	
+	
+	//////////////////////////////////////////////
+	// Negative X
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent , -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent , -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, -fExtent) );
+		
+	//////////////////////////////////////////////////
+	// Positive Y
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
+	
+	///////////////////////////////////////////////////
+	// Negative Y
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, fExtent) );
+	
+	
+	////////////////////////////////////////////////
+	// Positive Z
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, 1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, fExtent) );
+	
+	
+	////////////////////////////////////////////////
+	// Negative Z
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, -1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, -fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( -1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(-fExtent, fExtent, -fExtent) );
+	
+	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
+	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
+	
+}

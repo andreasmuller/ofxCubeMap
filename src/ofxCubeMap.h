@@ -65,9 +65,8 @@ class ofxCubeMap
 		void bind();
 		void bindToTextureUnit( int pos ); 										// Sometimes you don't want it in texture unit 0.
 		void unbind();
-
-		void enableFixedMapping();												// Used when drawing without a shader.
-		void disableFixedMapping();
+	
+		void drawSkybox( float _size );
 	
 		// Drawing into -------------
 	
@@ -90,10 +89,10 @@ class ofxCubeMap
 		int getHeight();
 	
 		float getFov();
-		void setFov( float _fov );
+		void  setFov( float _fov );
 			
 		ofVec2f getNearFar();
-		void setNearFar( ofVec2f _nearFar );
+		void 	setNearFar( ofVec2f _nearFar );
 	
 		void setPosition( ofVec3f& _pos );
 		void setPosition( float _x, float _y, float _z );
@@ -102,20 +101,26 @@ class ofxCubeMap
 		ofMatrix4x4 getPerspectiveMatrix();
 		ofMatrix4x4 getLookAtMatrixForFace( GLuint _face );
 	
+		ofMesh fillScreenMesh;
+	
 	private:
 		
 		string getDescriptiveStringForFace( GLuint _face );
+		void setupSkyBoxVertices();
 	
 		int size;
 	
 		unsigned int textureObjectID;
 		
 		ofFbo fbo;
-	
+			
 		// swap for an ofMesh when it supports ofVec3f tex coordinates
 		vector<ofVec3f> scratchVertices;
 		vector<ofVec3f> scratchTexCoords;
 		vector<ofIndexType> scratchIndices;
+	
+		vector<ofVec3f> cubemapVertices;
+		vector<ofVec3f> cubemapTexCoords;
 	
 		float fov;
 		float near;
