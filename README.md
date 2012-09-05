@@ -58,7 +58,7 @@ To draw into it in 2D, this will clear each face to black and draw a line from o
 
 
 
-It can then be placed in the scene:
+If you want to draw your 3D scene into it, you can place it in the scene:
 
 	myFboCubeMap.setPosition( 0.0f, 40.0f, 0.0f );
 
@@ -70,7 +70,7 @@ And then you can draw the 3D scene into it like so:
 
 			ofClear(0,0,0);
 			drawScene();
-			
+
 		myFboCubeMap.endDrawingInto3D();
 	}
 
