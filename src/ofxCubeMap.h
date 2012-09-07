@@ -98,11 +98,9 @@ class ofxCubeMap
 		void setPosition( float _x, float _y, float _z );
 		ofVec3f* getPosition();
 
-		ofMatrix4x4 getPerspectiveMatrix();
+		ofMatrix4x4 getProjectionMatrix();
 		ofMatrix4x4 getLookAtMatrixForFace( GLuint _face );
-	
-		ofMesh fillScreenMesh;
-	
+
 	private:
 		
 		string getDescriptiveStringForFace( GLuint _face );

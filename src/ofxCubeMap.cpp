@@ -10,27 +10,6 @@ ofxCubeMap::ofxCubeMap()
 	
 	cubeMapCamerasRenderPosition.set( 0.0f, 0.0f, 0.0f );
 	
-
-	fillScreenMesh.setMode( OF_PRIMITIVE_TRIANGLES );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(1, 1) );
-	fillScreenMesh.addVertex( 	ofVec3f(1,  1,  0) );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(0, 1) );
-	fillScreenMesh.addVertex( 	ofVec3f(-1,  1,  0) );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(0, 0) );
-	fillScreenMesh.addVertex( 	ofVec3f(-1, -1,  0) );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(1, 1) );
-	fillScreenMesh.addVertex( 	ofVec3f(1,  1,  0) );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(0, 0) );
-	fillScreenMesh.addVertex( 	ofVec3f(-1, -1,  0) );
-	
-	fillScreenMesh.addTexCoord( ofVec2f(1, 0) );
-	fillScreenMesh.addVertex( 	ofVec3f(1, -1,  0) );
-	
 	setupSkyBoxVertices();
 	
 }
@@ -197,7 +176,7 @@ void ofxCubeMap::beginDrawingInto3D( GLuint _face )
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	
-	glLoadMatrixf( getPerspectiveMatrix().getPtr() );
+	glLoadMatrixf( getProjectionMatrix().getPtr() );
 		
   	glMatrixMode( GL_MODELVIEW );
 	ofPushMatrix();
@@ -267,7 +246,7 @@ void ofxCubeMap::debugDrawCubemapCameras()
 	for( int i = 0; i < 6; i++ )
 	{
 		GLuint face = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
-		ofMatrix4x4 modelViewProjectionMatrix = getLookAtMatrixForFace( face ) * getPerspectiveMatrix();
+		ofMatrix4x4 modelViewProjectionMatrix = getLookAtMatrixForFace( face ) * getProjectionMatrix();
 		
 		ofMatrix4x4 inverseCameraMatrix;
 		inverseCameraMatrix.makeInvertOf( modelViewProjectionMatrix );
@@ -350,7 +329,7 @@ ofVec3f* ofxCubeMap::getPosition()
 }
 
 //--------------------------------------------------------------
-ofMatrix4x4 ofxCubeMap::getPerspectiveMatrix()
+ofMatrix4x4 ofxCubeMap::getProjectionMatrix()
 {
 	ofMatrix4x4 perspectiveMatrix;
 	perspectiveMatrix.makePerspectiveMatrix(fov, size/(float)size, near, far );
