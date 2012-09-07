@@ -131,7 +131,7 @@ void ofxCubeMap::loadFromOfImages(  ofImage pos_x, ofImage neg_x,
 
 
 //--------------------------------------------------------------
-void ofxCubeMap::initEmptyTextures( int _size, GLuint _type )
+void ofxCubeMap::initEmptyTextures( int _size, GLuint _channels, GLuint _storageFormat )
 {
 	size = _size;
 	
@@ -152,7 +152,7 @@ void ofxCubeMap::initEmptyTextures( int _size, GLuint _type )
 	// set textures
 	for (int i = 0; i < 6; ++i)
 	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _type, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _channels, size, size, 0, GL_RGB, _storageFormat, 0);
 	}
 		
 	ofFbo::Settings fboSettings = ofFbo::Settings();

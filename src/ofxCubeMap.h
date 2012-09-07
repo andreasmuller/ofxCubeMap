@@ -60,7 +60,7 @@ class ofxCubeMap
 
 		// Drawing ------------------
 	
-		void initEmptyTextures( int _size, GLuint _type = GL_RGB );				// Initialize empty textures to draw on later.
+		void initEmptyTextures( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
 		
 		void bind();
 		void bindToTextureUnit( int pos ); 										// Sometimes you don't want it in texture unit 0.
