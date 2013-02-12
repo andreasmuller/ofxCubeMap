@@ -23,7 +23,7 @@ Then to draw it:
 			myCubeMap.drawSkybox( 800 );
 		myCubeMap.unbind();
 
-It can also be drawn using tyhe supplied shader doing something like:
+It can also be drawn using the supplied shader doing something like:
 
 	myCubeMap.bind();
 
