@@ -79,6 +79,7 @@ class ofxCubeMap
 		// Misc ---------------------
 	
 		void debugDrawCubemapCameras();
+		void debugDrawCubemapFaces( float _faceSize, float _border = 0.0f );
 
 		void drawFace( GLuint _face, float _x, float _y );
 		void drawFace( GLuint _face, float _x, float _y, float _w, float _h );

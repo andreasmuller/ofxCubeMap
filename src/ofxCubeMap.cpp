@@ -178,7 +178,7 @@ void ofxCubeMap::beginDrawingInto3D( GLuint _face )
 	
 	glLoadMatrixf( getProjectionMatrix().getPtr() );
 		
-  	glMatrixMode( GL_MODELVIEW );
+	glMatrixMode( GL_MODELVIEW );
 	ofPushMatrix();
 	glLoadMatrixf( getLookAtMatrixForFace( _face ).getPtr() );
 	
@@ -264,6 +264,17 @@ void ofxCubeMap::debugDrawCubemapCameras()
 		
 		ofPopMatrix();
 		
+	}
+}
+
+//--------------------------------------------------------------
+void ofxCubeMap::debugDrawCubemapFaces( float _faceSize, float _border )
+{
+	for( int i = 0; i < 6; i++ )
+	{
+		int tmpX = (i * _faceSize) + (i * _border);
+		int tmpY = 0;
+		drawFace( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i , tmpX, tmpY, _faceSize, _faceSize );
 	}
 }
 
