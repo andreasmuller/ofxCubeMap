@@ -5,8 +5,8 @@
 ofxCubeMap::ofxCubeMap()
 {
 	fov 	= 90.0f;
-	near 	= 0.01f;
-	far 	= 1024.0f;
+	nearZ 	= 0.01f;
+	farZ 	= 1024.0f;
 	
 	cubeMapCamerasRenderPosition.set( 0.0f, 0.0f, 0.0f );
 	
@@ -139,7 +139,7 @@ void ofxCubeMap::initEmptyTextures( int _size, GLuint _channels, GLuint _storage
 	fboSettings.width  = size;
 	fboSettings.height = size;
 
-	fboSettings.numColorbuffers = 0; // we intend to attach our own colour buffers
+	fboSettings.numColorbuffers = 6; // we intend to attach our own colour buffers
 	
 	fboSettings.useDepth = true;
 	
@@ -311,14 +311,14 @@ void ofxCubeMap::setFov( float _fov )
 //--------------------------------------------------------------
 ofVec2f ofxCubeMap::getNearFar()
 {
-	return ofVec2f( near, far );
+	return ofVec2f( nearZ, farZ );
 }
 
 //--------------------------------------------------------------
 void ofxCubeMap::setNearFar( ofVec2f _nearFar )
 {
-	near = _nearFar.x;
-	far  = _nearFar.y;
+	nearZ = _nearFar.x;
+	farZ  = _nearFar.y;
 }
 
 //--------------------------------------------------------------
@@ -343,7 +343,7 @@ ofVec3f* ofxCubeMap::getPosition()
 ofMatrix4x4 ofxCubeMap::getProjectionMatrix()
 {
 	ofMatrix4x4 perspectiveMatrix;
-	perspectiveMatrix.makePerspectiveMatrix(fov, size/(float)size, near, far );
+	perspectiveMatrix.makePerspectiveMatrix(fov, size/(float)size, nearZ, farZ );
 	
 	return perspectiveMatrix;
 }

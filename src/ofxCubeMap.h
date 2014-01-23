@@ -63,10 +63,10 @@ class ofxCubeMap
 		void initEmptyTextures( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
 		
 		void bind();
-		void bindToTextureUnit( int pos ); 										// Sometimes you don't want it in texture unit 0.
+		void bindToTextureUnit( int pos ); 		// Todo: just overload bind with a default parameter of 0
 		void unbind();
 	
-		void drawSkybox( float _size );
+		void drawSkybox( float _size ); 		// Todo: why does this not bind the cubemap texture?!
 	
 		// Drawing into -------------
 	
@@ -122,8 +122,8 @@ class ofxCubeMap
 		vector<ofVec3f> cubemapTexCoords;
 	
 		float fov;
-		float near;
-		float far;
+		float nearZ;
+		float farZ;
 	
 		ofVec3f		cubeMapCamerasRenderPosition;
 	
