@@ -11,14 +11,13 @@ ofxCubeMap::ofxCubeMap()
 	cubeMapCamerasRenderPosition.set( 0.0f, 0.0f, 0.0f );
 	
 	setupSkyBoxVertices();
-	
 }
 
 //--------------------------------------------------------------
 // these should all be the same size and all power of two
-void ofxCubeMap::loadImages( string pos_x, string neg_x,
-							 string pos_y, string neg_y,
-							 string pos_z, string neg_z )
+void ofxCubeMap::load( string pos_x, string neg_x,
+					   string pos_y, string neg_y,
+					   string pos_z, string neg_z )
 {	
 	
 	// We don't want the texture border hack to be on
@@ -29,23 +28,25 @@ void ofxCubeMap::loadImages( string pos_x, string neg_x,
 		ofLogVerbose() << "ofxCubeMap:loadImages (string version), disabled texture hack, re-enabling when done.";
 	}*/
 	
+	ofDisableArbTex();
+	
 	ofImage images[6];	
-	bool loaded1 = images[0].loadImage(pos_x);
-	bool loaded2 = images[1].loadImage(neg_x);
-	bool loaded3 = images[2].loadImage(pos_y);
-	bool loaded4 = images[3].loadImage(neg_y);
-	bool loaded5 = images[4].loadImage(pos_z);
-	bool loaded6 = images[5].loadImage(neg_z);
+	bool loaded1 = images[0].load(pos_x);
+	bool loaded2 = images[1].load(neg_x);
+	bool loaded3 = images[2].load(pos_y);
+	bool loaded4 = images[3].load(neg_y);
+	bool loaded5 = images[4].load(pos_z);
+	bool loaded6 = images[5].load(neg_z);
 	
 	if( loaded1 && loaded2 && loaded3 && loaded4 && loaded5 && loaded6 ) {}
 	else { ofLogError() << "ofxCubeMap: failed to load one of the cubemaps!"; }
 	
-	loadFromOfImages(images[0],
-					 images[1],
-					 images[2],
-					 images[3],
-					 images[4],
-					 images[5]);
+	init( images[0],
+		  images[1],
+		  images[2],
+		  images[3],
+		  images[4],
+		  images[5] );
 	
 	/* if( wantsTextureBorderHack ) {
 		ofEnableTextureEdgeHack();
@@ -55,9 +56,9 @@ void ofxCubeMap::loadImages( string pos_x, string neg_x,
 
 //--------------------------------------------------------------
 
-void ofxCubeMap::loadFromOfImages(  ofImage pos_x, ofImage neg_x,
-								  	ofImage pos_y, ofImage neg_y,
-								  	ofImage pos_z, ofImage neg_z )
+void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
+					   ofImage pos_y, ofImage neg_y,
+					   ofImage pos_z, ofImage neg_z )
 {	
 	
 	//_ofEnable( GL_TEXTURE_CUBE_MAP_SEAMLESS );
@@ -81,16 +82,6 @@ void ofxCubeMap::loadFromOfImages(  ofImage pos_x, ofImage neg_x,
 	
 	size = pos_x.getWidth();
 	
-	//cout << "ofxCubeMap::loadFromOfImages, size: " << size << "  bpp: " << pos_x.bpp << endl;
-	
-//	data_px = new unsigned char [size * size * 3];
-//	data_py = new unsigned char [size * size * 3];
-//	data_pz = new unsigned char [size * size * 3];
-	
-//	data_nx = new unsigned char [size * size * 3];
-//	data_ny = new unsigned char [size * size * 3];
-//	data_nz = new unsigned char [size * size * 3];
-	
 	data_px = pos_x.getPixels();
 	data_py = pos_y.getPixels();
 	data_pz = pos_z.getPixels();	
@@ -110,7 +101,7 @@ void ofxCubeMap::loadFromOfImages(  ofImage pos_x, ofImage neg_x,
 
 
 //--------------------------------------------------------------
-void ofxCubeMap::initEmptyTextures( int _size, GLuint _channels, GLuint _storageFormat )
+void ofxCubeMap::initFbos( int _size, GLuint _channels, GLuint _storageFormat )
 {
 	size = _size;
 	
@@ -173,14 +164,12 @@ void ofxCubeMap::beginDrawingInto3D( GLuint _face )
 
 	beginDrawingInto2D( _face );	
 	
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	
-	glLoadMatrixf( getProjectionMatrix().getPtr() );
+	ofSetMatrixMode( OF_MATRIX_PROJECTION );
+	ofLoadMatrix( getProjectionMatrix() );
 		
-	glMatrixMode( GL_MODELVIEW );
+	ofSetMatrixMode( OF_MATRIX_MODELVIEW );
 	ofPushMatrix();
-	glLoadMatrixf( getLookAtMatrixForFace( _face ).getPtr() );
+	ofLoadMatrix( getLookAtMatrixForFace( _face ) );
 	
 }
 
@@ -199,7 +188,6 @@ void ofxCubeMap::bind()
 {
 	bindToTextureUnit( 0 );
 }
-
 
 //--------------------------------------------------------------
 void ofxCubeMap::bindToTextureUnit( int pos )
@@ -223,21 +211,39 @@ void ofxCubeMap::unbind()
 }
 
 //--------------------------------------------------------------
-void ofxCubeMap::drawSkybox( float _size )
+void ofxCubeMap::drawSkybox( ofVec3f _pos, float _size )
 {
 	
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapVertices.data()->x );
+	if( !drawCubeMapShader.isLoaded() )
+	{
+		initShader();
+	}
 	
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapTexCoords.data()->x );
+	drawCubeMapShader.begin();
 	
-	ofPushMatrix();
-		ofScale( _size, _size, _size );
-		glDrawArrays(GL_TRIANGLES, 0, cubemapVertices.size() );
-	glPopMatrix();
+	bind();
 	
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		ofDrawBox( _pos, _size );
+	
+		// Todo: support drawing the cube map without shaders? If so we need to send over texture coordinates as ofVec3f which ofMesh doesn't support yet
+		/*
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapVertices.data()->x );
+		
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapTexCoords.data()->x );
+	
+		ofPushMatrix();
+			ofScale( _size, _size, _size );
+			glDrawArrays(GL_TRIANGLES, 0, cubemapVertices.size() );
+		ofPopMatrix();
+		
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		 */
+	
+	unbind();
+	
+	drawCubeMapShader.end();
 }
 
 //--------------------------------------------------------------
@@ -248,17 +254,14 @@ void ofxCubeMap::debugDrawCubemapCameras()
 		GLuint face = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
 		ofMatrix4x4 modelViewProjectionMatrix = getLookAtMatrixForFace( face ) * getProjectionMatrix();
 		
-		ofMatrix4x4 inverseCameraMatrix;
-		inverseCameraMatrix.makeInvertOf( modelViewProjectionMatrix );
-		
 		ofPushMatrix();
 			
-			glMultMatrixf( inverseCameraMatrix.getPtr() );
+			ofMultMatrix( modelViewProjectionMatrix.getInverse() );
 	
 			ofNoFill();
 		
 				// Draw box in camera space, i.e. frustum in world space, box -1, -1, -1 to +1, +1, +1
-				ofBox(0, 0, 0, 2.0f);
+				ofDrawBox(0, 0, 0, 2.0f);
 			
 			ofFill();
 		
@@ -378,7 +381,6 @@ ofMatrix4x4 ofxCubeMap::getLookAtMatrixForFace( GLuint _face )
 			break;
     }
 	
-	//lookAt.translate( cubeMapCamerasRenderPosition.x, cubeMapCamerasRenderPosition.y, cubeMapCamerasRenderPosition.z );
 	lookAt.glTranslate( -cubeMapCamerasRenderPosition.x, -cubeMapCamerasRenderPosition.y, -cubeMapCamerasRenderPosition.z );
 	
 	return lookAt;
@@ -484,7 +486,7 @@ void ofxCubeMap::drawFace( GLuint _face, float _x, float _y, float _w, float _h 
 	scratchIndices.push_back( 2 );
 	scratchIndices.push_back( 3 );
 	
-	// swap all this for an ofMesh when it supports ofVec3f tex coordinates
+	// Swap all this for an ofMesh when it supports ofVec3f tex coordinates
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &scratchVertices.data()->x );
@@ -542,13 +544,7 @@ string ofxCubeMap::getDescriptiveStringForFace( GLuint _face )
 //--------------------------------------------------------------
 void ofxCubeMap::setupSkyBoxVertices()
 {
-	
-	//ofScale( _size, _size, _size );
-	//ofScale( _size / 2.0f, _size / 2.0f, _size / 2.0f );
-	
 	float fExtent = 1.0f / 2.0f;
-	
-	
 	
 	///////////////////////////////////////////////
 	//  Postive X
@@ -674,3 +670,58 @@ void ofxCubeMap::setupSkyBoxVertices()
 	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
 	
 }
+
+
+//--------------------------------------------------------------
+void ofxCubeMap::initShader()
+{
+	
+	// Begin GL3 version
+	// We can't use '#' inside STRINGIFY
+	string shaderVert = string("#version 330\nprecision highp float;\n") + STRINGIFY(
+																					 
+		 layout(location = 0) in vec4  position;
+		 layout(location = 1) in vec4  color;
+		 layout(location = 2) in vec3  normal;
+		 layout(location = 3) in vec2  texcoord;
+		 
+		 uniform mat4 projectionMatrix;
+		 uniform mat4 modelViewMatrix;
+		 uniform mat4 modelViewProjectionMatrix;
+		 uniform mat4 normalMatrix;
+		 
+		 out VertexAttrib {
+			 vec3 texcoord;
+		 } vertex;
+		 
+		 void main(void) 
+		{
+			vertex.texcoord = normalize(position.xyz);
+			gl_Position = modelViewProjectionMatrix * position;
+		}
+	);
+	// End GL3 version
+	
+	string shaderFrag = string("#version 330\nprecision highp float;\n") + STRINGIFY(
+		 
+		uniform samplerCube EnvMap;
+
+		in VertexAttrib {
+			vec3 texcoord;
+		} vertex;
+
+		out vec4 fragColor;
+
+		void main (void)
+		{
+			vec4 envColor = texture(EnvMap, vertex.texcoord);
+			fragColor = envColor;
+		}
+	);
+	
+	drawCubeMapShader.setupShaderFromSource(GL_VERTEX_SHADER, shaderVert );
+	drawCubeMapShader.setupShaderFromSource(GL_FRAGMENT_SHADER, shaderFrag );
+	drawCubeMapShader.linkProgram();
+	
+}
+

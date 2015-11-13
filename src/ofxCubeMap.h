@@ -35,11 +35,21 @@
  *
  */
 
+/*
+GL_TEXTURE_CUBE_MAP_POSITIVE_X	Right
+GL_TEXTURE_CUBE_MAP_NEGATIVE_X	Left
+GL_TEXTURE_CUBE_MAP_POSITIVE_Y	Top
+GL_TEXTURE_CUBE_MAP_NEGATIVE_Y	Bottom
+GL_TEXTURE_CUBE_MAP_POSITIVE_Z	Back
+GL_TEXTURE_CUBE_MAP_NEGATIVE_Z	Front
+*/
 
 #ifndef	OFX_CUBE_MAP_H
 #define OFX_CUBE_MAP_H
 
 #include "ofMain.h"
+
+#define STRINGIFY(A) #A
 
 class ofxCubeMap
 {
@@ -50,23 +60,23 @@ class ofxCubeMap
 		// Init ---------------------
 	
 		// These should all be the same size and all power of two, i.e. 256, 512, 1024 (I think).
-		void loadImages( string pos_x, string neg_x,
+		void load( string pos_x, string neg_x,
 						 string pos_y, string neg_y,
 						 string pos_z, string neg_z );
 		
-		void loadFromOfImages( ofImage pos_x, ofImage neg_x,
+		void init( ofImage pos_x, ofImage neg_x,
 							   ofImage pos_y, ofImage neg_y,
 							   ofImage pos_z, ofImage neg_z );
 
 		// Drawing ------------------
 	
-		void initEmptyTextures( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
+		void initFbos( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
 		
 		void bind();
-		void bindToTextureUnit( int pos ); 		// Todo: just overload bind with a default parameter of 0
+		void bindToTextureUnit( int pos = 0 );
 		void unbind();
-	
-		void drawSkybox( float _size ); 		// Todo: why does this not bind the cubemap texture?!
+
+		void drawSkybox( ofVec3f _pos, float _size );
 	
 		// Drawing into -------------
 	
@@ -101,11 +111,14 @@ class ofxCubeMap
 
 		ofMatrix4x4 getProjectionMatrix();
 		ofMatrix4x4 getLookAtMatrixForFace( GLuint _face );
-
+	
 	private:
-		
+	
 		string getDescriptiveStringForFace( GLuint _face );
 		void setupSkyBoxVertices();
+
+		void initShader();
+		ofShader drawCubeMapShader;
 	
 		int size;
 	
