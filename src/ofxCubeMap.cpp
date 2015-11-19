@@ -21,12 +21,13 @@ void ofxCubeMap::load( string pos_x, string neg_x,
 {	
 	
 	// We don't want the texture border hack to be on
-	/*bool wantsTextureBorderHack = false;
-	if( ofGetTextureEdgeHackEnabled() ) {
+	bool wantsTextureBorderHack = false;
+	if( ofIsTextureEdgeHackEnabled() )
+	{
 		wantsTextureBorderHack = true;
 		ofDisableTextureEdgeHack();
 		ofLogVerbose() << "ofxCubeMap:loadImages (string version), disabled texture hack, re-enabling when done.";
-	}*/
+	}
 	
 	ofDisableArbTex();
 	
@@ -48,9 +49,10 @@ void ofxCubeMap::load( string pos_x, string neg_x,
 		  images[4],
 		  images[5] );
 	
-	/* if( wantsTextureBorderHack ) {
+	if( wantsTextureBorderHack )
+	{
 		ofEnableTextureEdgeHack();
-	} */
+	}
 	
 }
 
@@ -61,7 +63,9 @@ void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
 					   ofImage pos_z, ofImage neg_z )
 {	
 	
-	//_ofEnable( GL_TEXTURE_CUBE_MAP_SEAMLESS );
+#ifndef TARGET_OPENGLES
+	glEnable( GL_TEXTURE_CUBE_MAP_SEAMLESS );
+#endif
 	
 	//create a texture object
 	glGenTextures(1, &textureObjectID);
@@ -228,7 +232,12 @@ void ofxCubeMap::drawSkybox( ofVec3f _pos, float _size )
 	
 	bind();
 	
-		ofDrawBox( _pos, _size );
+		ofBoxPrimitive tmpBox( _size, _size, _size, 1, 1, 1 );
+	
+		ofPushMatrix();
+			ofTranslate( _pos );
+			tmpBox.getMesh().draw();
+		ofPopMatrix();
 	
 		// Todo: support drawing the cube map without shaders? If so we need to send over texture coordinates as ofVec3f which ofMesh doesn't support yet
 	
