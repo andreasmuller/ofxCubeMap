@@ -82,6 +82,8 @@ void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
 	
 	size = pos_x.getWidth();
 	
+	//cout << "Channels " << pos_x.getPixels().getNumChannels() << endl;
+	
 	data_px = pos_x.getPixels();
 	data_py = pos_y.getPixels();
 	data_pz = pos_z.getPixels();	
@@ -90,13 +92,16 @@ void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
 	data_ny = neg_y.getPixels();	
 	data_nz = neg_z.getPixels();
 	
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_px); // positive x
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_py); // positive y
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_pz); // positive z	
+	GLuint pixelFormat = GL_RGB;
+	if( pos_x.getPixels().getNumChannels() == 4 ) pixelFormat = GL_RGBA;
 	
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_nx); // negative x
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_ny); // negative y
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_nz); // negative z	
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_px); // positive x
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_py); // positive y
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_pz); // positive z
+	
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_nx); // negative x
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_ny); // negative y
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, size, size, 0, pixelFormat, GL_UNSIGNED_BYTE, data_nz); // negative z
 }
 
 
@@ -226,6 +231,7 @@ void ofxCubeMap::drawSkybox( ofVec3f _pos, float _size )
 		ofDrawBox( _pos, _size );
 	
 		// Todo: support drawing the cube map without shaders? If so we need to send over texture coordinates as ofVec3f which ofMesh doesn't support yet
+	
 		/*
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer( 	3, GL_FLOAT, sizeof(ofVec3f), &cubemapVertices.data()->x );
@@ -239,7 +245,7 @@ void ofxCubeMap::drawSkybox( ofVec3f _pos, float _size )
 		ofPopMatrix();
 		
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		 */
+		*/
 	
 	unbind();
 	
