@@ -110,7 +110,7 @@ void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
 
 
 //--------------------------------------------------------------
-void ofxCubeMap::initFbos( int _size, GLuint _channels, GLuint _storageFormat )
+void ofxCubeMap::init( int _size, GLuint _channels, GLuint _storageFormat )
 {
 	size = _size;
 	
@@ -193,13 +193,7 @@ void ofxCubeMap::endDrawingInto3D()
 }
 
 //--------------------------------------------------------------
-void ofxCubeMap::bind()
-{
-	bindToTextureUnit( 0 );
-}
-
-//--------------------------------------------------------------
-void ofxCubeMap::bindToTextureUnit( int pos )
+void ofxCubeMap::bind( int pos )
 {
 	boundToTextureUnit = pos;
 	

@@ -70,10 +70,9 @@ class ofxCubeMap
 
 		// Drawing ------------------
 	
-		void initFbos( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
+		void init( int _size, GLuint _channels = GL_RGB, GLuint _storageFormat = GL_UNSIGNED_BYTE );				// Initialize empty textures to draw on later.
 		
-		void bind();
-		void bindToTextureUnit( int pos = 0 );
+		void bind( int pos = 0 );
 		void unbind();
 
 		void drawSkybox( ofVec3f _pos, float _size );
