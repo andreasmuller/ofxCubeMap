@@ -88,13 +88,13 @@ void ofxCubeMap::init( ofImage pos_x, ofImage neg_x,
 	
 	//cout << "Channels " << pos_x.getPixels().getNumChannels() << endl;
 	
-	data_px = pos_x.getPixels();
-	data_py = pos_y.getPixels();
-	data_pz = pos_z.getPixels();	
+	data_px = pos_x.getPixels().getData();
+	data_py = pos_y.getPixels().getData();
+	data_pz = pos_z.getPixels().getData();
 	
-	data_nx = neg_x.getPixels();
-	data_ny = neg_y.getPixels();	
-	data_nz = neg_z.getPixels();
+	data_nx = neg_x.getPixels().getData();
+	data_ny = neg_y.getPixels().getData();
+	data_nz = neg_z.getPixels().getData();
 	
 	GLuint pixelFormat = GL_RGB;
 	if( pos_x.getPixels().getNumChannels() == 4 ) pixelFormat = GL_RGBA;
