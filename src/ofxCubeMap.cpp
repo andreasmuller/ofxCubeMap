@@ -198,7 +198,9 @@ void ofxCubeMap::bind( int pos )
 	boundToTextureUnit = pos;
 	
 	glActiveTexture( GL_TEXTURE0 + pos );
+#ifndef TARGET_OPENGLES
 	glEnable( GL_TEXTURE_CUBE_MAP );
+#endif
 	glBindTexture( GL_TEXTURE_CUBE_MAP, textureObjectID );
 }
 
@@ -208,8 +210,9 @@ void ofxCubeMap::unbind()
 	glActiveTexture( GL_TEXTURE0 + boundToTextureUnit );
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0 );
+#ifndef TARGET_OPENGLES
 	glDisable( GL_TEXTURE_CUBE_MAP );
-	
+#endif
 	glActiveTexture( GL_TEXTURE0 );
 }
 
@@ -677,9 +680,7 @@ void ofxCubeMap::setupSkyBoxVertices()
 	
 	cubemapTexCoords.push_back( ofVec3f( 1.0f, 1.0f, -1.0f) );
 	cubemapVertices.push_back( ofVec3f(fExtent, fExtent, -fExtent) );
-	
 }
-
 
 //--------------------------------------------------------------
 void ofxCubeMap::initShader()
