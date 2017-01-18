@@ -30,12 +30,12 @@ void ofxCubeMap::loadImages( string pos_x, string neg_x,
 	}*/
 	
 	ofImage images[6];	
-	bool loaded1 = images[0].loadImage(pos_x);
-	bool loaded2 = images[1].loadImage(neg_x);
-	bool loaded3 = images[2].loadImage(pos_y);
-	bool loaded4 = images[3].loadImage(neg_y);
-	bool loaded5 = images[4].loadImage(pos_z);
-	bool loaded6 = images[5].loadImage(neg_z);
+	bool loaded1 = images[0].load(pos_x);
+	bool loaded2 = images[1].load(neg_x);
+	bool loaded3 = images[2].load(pos_y);
+	bool loaded4 = images[3].load(neg_y);
+	bool loaded5 = images[4].load(pos_z);
+	bool loaded6 = images[5].load(neg_z);
 	
 	if( loaded1 && loaded2 && loaded3 && loaded4 && loaded5 && loaded6 ) {}
 	else { ofLogError() << "ofxCubeMap: failed to load one of the cubemaps!"; }
@@ -91,13 +91,13 @@ void ofxCubeMap::loadFromOfImages(  ofImage pos_x, ofImage neg_x,
 //	data_ny = new unsigned char [size * size * 3];
 //	data_nz = new unsigned char [size * size * 3];
 	
-	data_px = pos_x.getPixels();
-	data_py = pos_y.getPixels();
-	data_pz = pos_z.getPixels();	
+	data_px = pos_x.getPixels().getData() ;
+	data_py = pos_y.getPixels().getData() ;
+	data_pz = pos_z.getPixels().getData() ;
 	
-	data_nx = neg_x.getPixels();
-	data_ny = neg_y.getPixels();	
-	data_nz = neg_z.getPixels();
+	data_nx = neg_x.getPixels().getData() ;
+	data_ny = neg_y.getPixels().getData() ;
+	data_nz = neg_z.getPixels().getData() ;
 	
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_px); // positive x
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, data_py); // positive y
@@ -258,7 +258,7 @@ void ofxCubeMap::debugDrawCubemapCameras()
 			ofNoFill();
 		
 				// Draw box in camera space, i.e. frustum in world space, box -1, -1, -1 to +1, +1, +1
-				ofBox(0, 0, 0, 2.0f);
+				ofDrawBox(0, 0, 0, 2.0f);
 			
 			ofFill();
 		
